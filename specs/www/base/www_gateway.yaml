@@ -1,0 +1,34 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  labels:
+    app.kubernetes.io/name: www-gateway
+    app.kubernetes.io/part-of: sample
+  name: www-gateway
+  namespace: www
+spec:
+  gatewayClassName: istio
+  listeners:
+    - hostname: www.your-domain.net
+      name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: All
+    - hostname: www.your-domain.net
+      name: https
+      port: 443
+      protocol: HTTPS
+      allowedRoutes:
+        kinds:
+          - kind: HTTPRoute
+        namespaces:
+          from: All
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: www-your-domain-net-tls
+            kind: Secret
+            group: ""
+

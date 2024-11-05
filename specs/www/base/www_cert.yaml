@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  labels:
+    app.kubernetes.io/part-of: sample
+  name: www-your-domain-net-cert
+  namespace: www
+spec:
+  commonName: www.your-domain.net
+  dnsNames:
+    - www.your-domain.net
+  issuerRef:
+    kind: ClusterIssuer
+    name: ca-issuer
+  secretName: www-your-domain-net-tls

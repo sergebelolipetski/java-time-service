@@ -1,0 +1,118 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: java-time-service-v1
+    app.kubernetes.io/version: 0.0.1
+    app.kubernetes.io/part-of: sample
+  name: java-time-service-v1
+  namespace: sample
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: java-time-service-v1
+      app.kubernetes.io/version: 0.0.1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: java-time-service-v1
+        app.kubernetes.io/version: 0.0.1
+        app.kubernetes.io/part-of: sample
+    spec:
+      containers:
+        - image: your.acr.net/sample/java-time-service:0.0.1
+          imagePullPolicy: Always
+          name: java-time-service
+          command: [ "java"]
+          args:
+            - -jar
+            - java-time-service.jar
+            - --spring.profiles.active=k8s
+            - --spring.config.location=/etc/java-time-service/
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 512Mi
+            requests:
+              cpu: 500m
+              memory: 256Mi
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /etc/java-time-service
+              name: java-time-service-config-secret-volume
+          env:
+            - name: OPTION
+              value: datetime
+            - name: NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+      volumes:
+        - name: java-time-service-config-secret-volume
+          secret:
+            secretName: java-time-service-config-secret
+            optional: false
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: java-time-service-v1
+    app.kubernetes.io/part-of: sample
+  name: java-time-service-v1
+  namespace: sample
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 9999
+  selector:
+    app.kubernetes.io/name: java-time-service-v1
+    app.kubernetes.io/version: 0.0.1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: java-time-service-v2
+    app.kubernetes.io/part-of: sample
+  name: java-time-service-v2
+  namespace: sample
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 9999
+  selector:
+    app.kubernetes.io/name: java-time-service-v2
+    app.kubernetes.io/version: 0.0.1
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: java-time-service-v3
+    app.kubernetes.io/part-of: sample
+  name: java-time-service-v3
+  namespace: sample
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 9999
+  selector:
+    app.kubernetes.io/name: java-time-service-v3
+    app.kubernetes.io/version: 0.0.1

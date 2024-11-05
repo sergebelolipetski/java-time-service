@@ -1,0 +1,35 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  labels:
+    app.kubernetes.io/name: java-time-service-route
+    app.kubernetes.io/part-of: sample
+  name: java-time-service-route
+  namespace: sample
+spec:
+  hostnames:
+    - www.your-domain.net
+  parentRefs:
+    - name: www-gateway
+      namespace: www
+      kind: Gateway
+  rules:
+    # This is an example of routing of two different versions of "java-time-service" service based on weight
+    - backendRefs:
+        - name: java-time-service-v1
+          port: 80
+#          weight: 50
+          weight: 100
+#        - name: java-time-service-v2
+#          port: 80
+#          weight: 50
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              replacePrefixMatch: /
+              type: ReplacePrefixMatch
+      matches:
+        - path:
+            type: PathPrefix
+            value: /java-time-service/

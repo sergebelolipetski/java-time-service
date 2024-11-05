@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: java-time-service
+  config:
+    activate:
+      on-profile: dev
+  main:
+    banner-mode: "off"
+
+# OpenTelemetry config
+# https://opentelemetry.io/docs/languages/java/configuration/
+otel:
+#  instrumentation:
+#    logback-appender:
+#      enabled: true
+  service:
+    name: ${spring.application.name}
+  springboot:
+    aspects:
+      enabled: true
+    # https://github.com/open-telemetry/opentelemetry-java-instrumentation/issues/3480
+    resource:
+      attributes:
+        service:
+          name: ${spring.application.name}
+  java:
+    global-autoconfigure:
+      enabled: true
+  exporter:
+    otlp:
+      endpoint: http://localhost:4318
+  resource:
+    attributes:
+      service:
+        name: ${spring.application.name}
+
+server:
+  port: 9999
+
+# Actuator endpoints
+management:
+  endpoints:
+    enabled-by-default: true
+    web:
+      exposure:
+        include: "health,info,metrics,prometheus"
+  endpoint:
+    info:
+      enabled: true
+
+

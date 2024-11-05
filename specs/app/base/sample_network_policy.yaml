@@ -1,0 +1,104 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-egress
+  namespace: sample
+  labels:
+    app.kubernetes.io/part-of: sample
+spec:
+  podSelector: {}
+  egress:
+    - ports:
+        - protocol: TCP
+          port: 53
+        - protocol: UDP
+          port: 53
+  policyTypes:
+  - Egress
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-all-ingress
+  namespace: sample
+  labels:
+    app.kubernetes.io/part-of: sample
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: sample
+  policyTypes:
+    - Ingress
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: java-time-service-to-opentelemetry-collector
+  namespace: sample
+  labels:
+    app.kubernetes.io/part-of: sample
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: sample
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: opentelemetry
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: java-time-service-allow-from-sample
+  namespace: sample
+  labels:
+    app.kubernetes.io/part-of: sample
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: sample
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: sample
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: java-time-service-allow-from-www
+  namespace: sample
+  labels:
+    app.kubernetes.io/part-of: sample
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: sample
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: www
+
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: java-time-service-allow-from-istio-system
+  namespace: sample
+  labels:
+    app.kubernetes.io/part-of: sample
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/part-of: sample
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: istio-system
